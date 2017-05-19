@@ -1,0 +1,83 @@
+//System.out.println(RankScores(TopicScoreMap));
+		/*Map.Entry<Integer,Float> maxEntry = null;
+
+		for(Map.Entry <Integer,Float> entry : TopicScoreMap.entrySet()) {
+	    if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+	        maxEntry = entry;
+	    }
+			}
+		//System.out.println(maxEntry);
+		
+		DocTopicMap.put(i,maxEntry.getKey());
+		//System.out.println("Document with its highest scoring topic:"+DocTopicMap);
+		// Get an array of sorted sets of word ID/count pairs
+		ArrayList<TreeSet<IDSorter>> topicSortedWords = model.getSortedWords();
+		
+		// Show top 5 words in topics with proportions for the first document
+		for (int topic = 0; topic < numTopics; topic++) {
+			Iterator<IDSorter> iterator1 = topicSortedWords.get(topic).iterator();
+			List<String> TopicWords=new ArrayList <String>();
+			out = new Formatter(new StringBuilder(), Locale.US);
+			out.format("%d\t%.3f\t", topic, topicDistribution[topic]);
+			int rank = 0;
+			while (iterator1.hasNext() && rank < 5) {
+				IDSorter idCountPair = iterator1.next();
+				out.format("%s (%.0f) ", dataAlphabet.lookupObject(idCountPair.getID()), idCountPair.getWeight());
+				
+				TopicWords.add(dataAlphabet.lookupObject(idCountPair.getID()).toString());
+				hm4.put(topic,TopicWords);
+				
+				//System.out.println("for topic "+topic+"topic words are: "+dataAlphabet.lookupObject(idCountPair.getID()));
+				rank++;
+			}
+			System.out.println(out);
+		}
+		
+		// Create a new instance with high probability of topic 0
+		StringBuilder topicZeroText = new StringBuilder();
+		Iterator<IDSorter> iterator1 = topicSortedWords.get(i).iterator();
+
+		int rank = 0;
+		while (iterator1.hasNext() && rank < 5) {
+			IDSorter idCountPair = iterator1.next();
+			topicZeroText.append(dataAlphabet.lookupObject(idCountPair.getID()) + " ");
+			rank++;
+		}
+
+		// Create a new instance named "test instance" with empty target and source fields.
+		InstanceList testing = new InstanceList(instances.getPipe());
+	//	System.out.println("Printing instance list:\t" + testing);
+		testing.addThruPipe(new Instance(topicZeroText.toString(), null, "test instance", null));
+
+		TopicInferencer inferencer = model.getInferencer();
+		double[] testProbabilities = inferencer.getSampledDistribution(testing.get(i), 10, 1, 5);
+		System.out.println("0\t" + testProbabilities[i]);
+	}*/
+	
+				/*Map.Entry<Integer,Float> maxEntry = null;
+					for(Map.Entry <Integer,Float> entry : TopicScoreMap.entrySet()) 
+					{
+					    if (maxEntry == null || entry.getValue() > maxEntry.getValue()) 
+					    {
+					        maxEntry = entry;
+					    }
+					}*/
+					//System.out.println(maxEntry);
+					
+					//System.out.println(DocTopicMap);	
+					
+					//BufferedWriter writ=new BufferedWriter(new FileWriter("PersonTopic.csv"));
+				
+					/*File toRead2=new File("Topic100FinalOutput/DocTopicList100");
+			
+					FileInputStream fis2=new FileInputStream(toRead2);
+			        ObjectInputStream ois2=new ObjectInputStream(fis2);
+			
+			        HashMap<String,Integer> DocTopicMap=(HashMap<String,Integer>)ois2.readObject();
+			
+			        ois2.close();
+			        fis2.close();*/
+				
+				
+				
+			//	int docid=0;

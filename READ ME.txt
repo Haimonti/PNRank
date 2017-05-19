@@ -1,0 +1,53 @@
+This is the source code for the project: finding influential people from a historical OCR news repository.
+(OCR text data taken from Chronicling America)
+Note: One needs to supply their own data in order to use this code.
+
+The code is written in Java and uses following libraries: stanford core nlp (for coreference resolution and named entity recognition)
+
+The Java files can be run according the following steps to generate the ranked list of influential people:
+
+a) Spelling Correction using edit distance algorithm. It uses a dictionary Finaldict.txt for correction and the datset folder to be spell corrected.
+-This is done using Spelling1.java
+
+b) Evaluate the spell correction algorithm using N-Gram based Spelling correction evaluation algorithm. This testing is only done on 300 news articles.
+-This is done using TestingFinal.java [TestingFinalN3.java has N-gram window set to 3]
+
+c) Perform Person Named Entity Recognition and create a list of person names, articles in which they occur, 
+their name frequency occurrence in the articles. It saves these in two maps: PersonDocList and PersonTFValuesNER
+-This is done using NERDemo.java
+
+d) Perform Coreference resolution to check the actual person name frequency in an article and replace with the one
+already there if this is higher. The new TF values are written in a map: PersonTFValues2310
+-This is done using NERCoref.java
+
+e) Create a document topic map for use in ranking of influential persons. The map is to be created from the 30 topic model
+probabilities as obtained from Mallet toolkit stored in Output.csv. The map is then stored as DocTopicProbList2.
+This file also has other functions like calculating kl divergence, length of a document,etc. used in calculating
+influential rank of a person
+-This is done using DocumentSimilarity.java
+
+f) Calculate the values of three features: NSIM, NDL, NTF for all persons from previous maps and functions in other
+Java files to get feature ranked and sorted individual lists of persons. The outputs are stored in rankedNTF.csv, rankedNSIM.csv, rankedNDL.csv  
+-This is done using IPCateogries2.java
+
+g) Calculate aggregated Borda score rank for all persons based on their individual rank list created earlier.
+The output is saved in BordScore3.csv
+-This is done using Borda.java
+
+h) Calculated aggregate median rank for all persons based on their individual rank list created earlier.
+The output is saved in rankedMedianScores.csv
+-This is done using KendallTau.java
+
+
+/*********
+SKIP THIS PORTION....THIS WAS FOR EARLIER THESIS RESULTS
+e) User certain functions for computation of influential person metrics such as normalized document length, normalized
+term frequency and normalized similarity (topic), unique topics among articles having a person's name
+-This is done by commenting and commenting functions of NER.java
+
+
+f) Divide all people into influential people categories based on the number of articles in which they occur and for each
+category, apply the IPI formula, calculate the score using hashmaps created from previous steps and obtain the ranked list
+of person names.
+-This is done using IPCategories.java.
+**********/

@@ -1,35 +1,36 @@
-import cc.mallet.pipe.*;
-import cc.mallet.pipe.iterator.CsvIterator;
-import cc.mallet.topics.ParallelTopicModel;
-import cc.mallet.types.Alphabet;
-import cc.mallet.types.FeatureSequence;
-import cc.mallet.types.InstanceList;
-import cc.mallet.types.LabelSequence;
-import edu.stanford.nlp.ie.AbstractSequenceClassifier;
-import edu.stanford.nlp.ie.crf.CRFClassifier;
-import edu.stanford.nlp.io.IOUtils;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.util.Triple;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.Pattern;
+        import cc.mallet.pipe.*;
+        import cc.mallet.pipe.iterator.CsvIterator;
+        import cc.mallet.topics.ParallelTopicModel;
+        import cc.mallet.types.Alphabet;
+        import cc.mallet.types.FeatureSequence;
+        import cc.mallet.types.InstanceList;
+        import cc.mallet.types.LabelSequence;
+        import edu.stanford.nlp.ie.AbstractSequenceClassifier;
+        import edu.stanford.nlp.ie.crf.CRFClassifier;
+        import edu.stanford.nlp.io.IOUtils;
+        import edu.stanford.nlp.ling.CoreLabel;
+        import edu.stanford.nlp.util.Triple;
+
+        import java.io.*;
+        import java.util.*;
+        import java.util.regex.Pattern;
 
 /**
  * @author Jayashree Chandrasekaran
  *
  */
 public class AnnotateTitles {
-public static void main(String args[]){
+    public static void main(String args[]){
 
-    String serializedClassifier = "/Users/jayashree/Documents/Resources_for_PNRank/stanford-ner-2016-10-31/classifiers/english.all.3class.distsim.crf.ser.gz";
+        String serializedClassifier = "/Users/jayashree/Documents/Resources_for_PNRank/stanford-ner-2016-10-31/classifiers/english.all.3class.distsim.crf.ser.gz";
 
-    if (args.length > 0)
-    {
-        serializedClassifier = args[0];
-    }
+        if (args.length > 0)
+        {
+            serializedClassifier = args[0];
+        }
 
-    AbstractSequenceClassifier<CoreLabel> classifier = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
+        AbstractSequenceClassifier<CoreLabel> classifier = CRFClassifier.getClassifierNoExceptions(serializedClassifier);
 
 
 
@@ -40,6 +41,8 @@ public static void main(String args[]){
         File folder=new File ("/Users/jayashree/Documents/Resources_for_PNRank/final");
         //HASHMAP WITH PERSON NAME AND CORRESPONDING DOCUMENTS LIST
         HashMap<String, List<String>> hm = new HashMap<String, List<String>>();
+        HashMap<String, List<String>> name_title_map = new HashMap<String, List<String>>();
+        ArrayList<String> names = new ArrayList<String>();
         //HASHMAP TO CALCULATE PERSON-DOCUMENT TF VALUES
         HashMap<String,HashMap< String,Integer>> PersonTFMap = new HashMap<String,HashMap<String,Integer>>();
         //HASHMAP WITH NUMBER OF DOCUMENTS AND CORRESPONDING PEOPLE LIST
@@ -59,7 +62,7 @@ public static void main(String args[]){
         try {
 //            BufferedWriter outp = new BufferedWriter(new FileWriter("/Users/jayashree/Documents/Output_PNRank/data/OutputofNERFinal.txt"));
 //            BufferedWriter outTFMap = new BufferedWriter(new FileWriter("/Users/jayashree/Documents/Output_PNRank/data/TopicFinalOutput/PersonTFMapFinal.txt"));
-            BufferedWriter outTitleMap = new BufferedWriter(new FileWriter("/Users/jayashree/Documents/Output_PNRank/data/AnnTitles.csv"));
+            BufferedWriter outTitleMap = new BufferedWriter(new FileWriter("/Users/jayashree/Documents/Output_PNRank/data/Signature_feature.csv"));
 //            BufferedWriter outTitle = new BufferedWriter(new FileWriter("/Users/jayashree/Documents/Output_PNRank/data/TopicFinalOutput/TitleList.txt"));
             //BufferedWriter outMalletData = new BufferedWriter(new FileWriter("/Users/Haimonti/Research/IIITD/Aayushee/Code/Source-Code/Thesis/src/ReputedPersonDetection/data/OCRDataMallet.txt"));
             //File[] listOfFiles = null;
@@ -129,6 +132,12 @@ public static void main(String args[]){
 //                                    outTFMap.write(entity.trim() + " " + Freq + "\n");
                                 }
                             }
+
+
+                            if(!names.contains(entity.trim().length()>1)){
+                                names.add(entity.trim());
+                            }
+
                             // if (triple.first.equalsIgnoreCase("LOCATION"))
                             //System.out.println("Entity Name is "+entity.trim());
                             //Get the title of this person if it exists
@@ -172,7 +181,7 @@ public static void main(String args[]){
                 } // end first for loop
 
             }// end of second for loop.
-            //System.out.println("titleMap" +titleHash);
+            System.out.println("Size of names is" +names.size());
             //PRINTING THE HASHMAP OF PERSONS WITH DOCUMENTS IN WHICH THEY OCCUR
 //        outp.close();
 //        outTFMap.close();
@@ -202,43 +211,70 @@ public static void main(String args[]){
             } catch (Exception e) {
                 e.printStackTrace();
             }
+           // ArrayList<String> tempList = new ArrayList<String>();
+
+            for (String element: names) {
+                if(element.split(" ").length>1) {
+                    ArrayList<String> emptyList = new ArrayList<String>();
+                    name_title_map.put(element, emptyList);
+                }
+
+            }
+            System.out.println("Size of name title map is before : " +name_title_map.size());
+            System.out.println("The size of the titleHash map is "+titleHash.size());
+            name_title_map.putAll(titleHash);
+            System.out.println("Size of name title map is after : " +name_title_map.size());
+
+            ArrayList<String> tempList = new ArrayList<String>();
 
             outTitleMap.write("Name of Person" +","+ "Titles"+","+"Wikipedia\n");
-            for (Map.Entry<String, List<String>> titleEntry : titleHash.entrySet()) {
+            for (Map.Entry<String, List<String>> titleEntry : name_title_map.entrySet()) {
                 String keyTitle = titleEntry.getKey();
                 List<String> titleVal = titleEntry.getValue();
                 Iterator titleItr = titleVal.iterator();
-
+                if (titleVal.isEmpty() && keyTitle.split(" ").length>1){
+                    if(!tempList.contains(keyTitle.toLowerCase())) {
+                        tempList.add(keyTitle.toLowerCase());
+                        outTitleMap.write(keyTitle + "," + "0" + "," + "0 \n");
+                    }
+                }
 
                 while (titleItr.hasNext()) {
-                    Object element = titleItr.next();
+                        Object element = titleItr.next();
 
-                    if(list_titles.contains(element.toString())){
-
-                        if(list_titles_wiki.contains(element.toString())) {
-                            outTitleMap.write(keyTitle + "," + "1"+","+" 1 \n");
-                        }else{
-                            outTitleMap.write(keyTitle + "," + "1"+","+" 0 \n");
+                        if(keyTitle.split(" ").length>1){
+                            if(!tempList.contains(keyTitle.toLowerCase())){
+                                tempList.add(keyTitle.toLowerCase());
+                                if(list_titles.contains(element.toString())){
+                                    if(list_titles_wiki.contains(element.toString())) {
+                                        outTitleMap.write(keyTitle + "," + "1"+","+" 1 \n");
+                                    }else{
+                                        outTitleMap.write(keyTitle + "," + "1"+","+" 0 \n");
+                                    }
+                                }else if(list_titles_wiki.contains(element.toString())){
+                                    outTitleMap.write(keyTitle+","+"0"+","+"1 \n" );
+                                }else{
+                                    outTitleMap.write(keyTitle+","+"0"+","+"0 \n");
+                                }
+                                }
+                            }
                         }
-                    }else if(list_titles_wiki.contains(element.toString())){
-                        outTitleMap.write(keyTitle+","+"0"+","+"1 \n" );
-                    }else{
-                        outTitleMap.write(keyTitle+","+"0"+","+"0 \n");
-                    }
+
+
 
                     //outTitleMap.write(element+" ");
                 }
 
+            outTitleMap.close();
 
-            }
-        outTitleMap.close();
-        //outTitle.write(titleBuf.toString());
+
+            //outTitle.write(titleBuf.toString());
 //        outTitle.flush();
 //        outTitle.close();
-        System.out.print("Done!!");
+            System.out.print("Done!!");
 
         }catch(Exception e){
-           e.printStackTrace();
+            e.printStackTrace();
         }
 //        outTitleMap.close();
 //        outTitle.write(titleBuf.toString());
@@ -472,7 +508,8 @@ public static void main(String args[]){
 //        System.out.println("Done!");
 
 
-} // end of main method
+    } // end of main method
 }
+
 
 
